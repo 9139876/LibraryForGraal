@@ -1,0 +1,46 @@
+drop table if exists %schema_name%.%Tbl_Quotes% cascade|
+drop table if exists %schema_name%.%Tbl_TickerTFs% cascade|
+drop table if exists %schema_name%.%Tbl_TickersInfoes% cascade|
+
+create table %schema_name%.%Tbl_TickersInfoes%
+(
+	%TickersInfoes_Id% int4 not null GENERATED ALWAYS AS IDENTITY,
+	%TickersInfoes_TickerId% text not null,
+	%TickersInfoes_Code% text not null,
+	%TickersInfoes_TickerTitle% text not null,
+	%TickersInfoes_MarketId% text not null,
+	%TickersInfoes_MarketTitle% text not null,
+	%TickersInfoes_Currency% text,
+	%TickersInfoes_VolumeCode% text,
+	%TickersInfoes_AutoUpdate% bool not null DEFAULT false,
+	%TickersInfoes_GetUrl% text,
+	CONSTRAINT %Tbl_TickersInfoes%_pkey PRIMARY KEY (%TickersInfoes_Id%),
+	CONSTRAINT %Tbl_TickersInfoes%_un UNIQUE (%TickersInfoes_TickerTitle%, %TickersInfoes_MarketTitle%)
+)|
+
+create table %schema_name%.%Tbl_TickerTFs%
+(
+	%TickerTFs_Id% int4 not null GENERATED ALWAYS AS IDENTITY,
+	%TickerTFs_Period% int4 not null,
+	%TickerTFs_TickerInfoId% int4 not null,
+	%TickerTFs_TradingTimeRules% text not null,
+	%TickerTFs_QuotesDateOfLastUpdate% timestamp not null,
+	CONSTRAINT %Tbl_TickerTFs%_pkey PRIMARY KEY (%TickerTFs_Id%),
+	CONSTRAINT %Tbl_TickerTFs%_un UNIQUE (%TickerTFs_Period%, %TickerTFs_TickerInfoId%),
+	CONSTRAINT %Tbl_TickerTFs%_fk FOREIGN KEY (%TickerTFs_TickerInfoId%) REFERENCES %schema_name%.%Tbl_TickersInfoes%(%TickersInfoes_Id%) ON UPDATE CASCADE ON DELETE CASCADE
+)|
+
+create table %schema_name%.%Tbl_Quotes%
+(
+	%Quotes_Id% int4 not null GENERATED ALWAYS AS IDENTITY,
+	%Quotes_TickerTFId% int4 not null,
+	%Quotes_Date% timestamp not null,
+	%Quotes_Open% numeric(16, 8) not null,
+	%Quotes_High% numeric(16, 8) not null,
+	%Quotes_Low% numeric(16, 8) not null,
+	%Quotes_Close% numeric(16, 8) not null,
+	%Quotes_Volume% numeric(16, 3) not null,	
+	CONSTRAINT %Tbl_Quotes%_pkey PRIMARY KEY (%Quotes_Id%),
+	CONSTRAINT %Tbl_Quotes%_un UNIQUE (%Quotes_TickerTFId%, %Quotes_Date%),
+	CONSTRAINT %Tbl_Quotes%_fk FOREIGN KEY (%Quotes_TickerTFId%) REFERENCES %schema_name%.%Tbl_TickerTFs%(%TickerTFs_Id%) ON UPDATE CASCADE ON DELETE CASCADE
+)

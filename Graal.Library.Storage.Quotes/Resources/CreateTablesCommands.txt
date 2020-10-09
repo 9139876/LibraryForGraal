@@ -43,4 +43,12 @@ create table %schema_name%.%Tbl_Quotes%
 	CONSTRAINT %Tbl_Quotes%_pkey PRIMARY KEY (%Quotes_Id%),
 	CONSTRAINT %Tbl_Quotes%_un UNIQUE (%Quotes_TickerTFId%, %Quotes_Date%),
 	CONSTRAINT %Tbl_Quotes%_fk FOREIGN KEY (%Quotes_TickerTFId%) REFERENCES %schema_name%.%Tbl_TickerTFs%(%TickerTFs_Id%) ON UPDATE CASCADE ON DELETE CASCADE
+)|
+
+create table %schema_name%.%Tbl_QuotesParserExpressions%
+(
+	%QuotesParserExpressions_Id% int4 not null GENERATED ALWAYS AS IDENTITY,
+	%QuotesParserExpressions_Specification% text not null,
+	CONSTRAINT %Tbl_QuotesParserExpressions%_pkey PRIMARY KEY (%QuotesParserExpressions_Id%),
+	CONSTRAINT %Tbl_QuotesParserExpressions%_un UNIQUE (%QuotesParserExpressions_Specification%)
 )

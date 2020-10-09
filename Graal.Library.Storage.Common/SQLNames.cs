@@ -8,6 +8,15 @@ namespace Graal.Library.Storage.Common
 {
     public class SQLNames
     {
+        #region QuotesGetter
+        public static readonly string Tbl_QuotesParserExpressions = "QuotesParserExpressions";
+
+        public static readonly string QuotesParserExpressions_Id = "id";
+
+        public static readonly string QuotesParserExpressions_Specification = "specification";
+
+        #endregion
+
         #region TickerInfo
         public static readonly string Tbl_TickersInfoes = "TickersInfoes";
 

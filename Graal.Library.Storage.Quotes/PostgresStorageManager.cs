@@ -20,7 +20,7 @@ namespace Graal.Library.Storage.Quotes
 
             if (sqlDriver.Connection != null)
                 quotesSqlDriver.Connection = sqlDriver.Connection;
-            else if (GetConnection(out NpgsqlConnection connection))
+            else if (TryGetConnection(out NpgsqlConnection connection))
                 quotesSqlDriver.Connection = connection;
         }
 

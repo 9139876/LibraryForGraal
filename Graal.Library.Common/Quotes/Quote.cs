@@ -17,23 +17,23 @@ namespace Graal.Library.Common.Quotes
 
         public double Open { get; private set; }
 
-        public string OpenS => Open.ToString(Constatnts.NFI);
+        public string OpenS => Open.ToString(GlobalVariables.NFI);
 
         public double Hi { get; private set; }
 
-        public string HiS => Hi.ToString(Constatnts.NFI);
+        public string HiS => Hi.ToString(GlobalVariables.NFI);
 
         public double Low { get; private set; }
 
-        public string LowS => Low.ToString(Constatnts.NFI);
+        public string LowS => Low.ToString(GlobalVariables.NFI);
 
         public double Close { get; private set; }
 
-        public string CloseS=> Close.ToString(Constatnts.NFI);
+        public string CloseS=> Close.ToString(GlobalVariables.NFI);
 
         public double Volume { get; private set; }
 
-        public string VolumeS => Volume.ToString(Constatnts.NFI);
+        public string VolumeS => Volume.ToString(GlobalVariables.NFI);
 
         public Quote(TickerTF tickerTF, DateTime date, double open, double hi, double low, double close, double volume, int storageId = Storage.StorageId.DefaultValue)
         {

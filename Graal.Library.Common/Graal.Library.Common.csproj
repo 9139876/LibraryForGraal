@@ -65,7 +65,7 @@
     <Compile Include="GUI\InfoWindow.Designer.cs">
       <DependentUpon>InfoWindow.cs</DependentUpon>
     </Compile>
-    <Compile Include="Constatnts.cs" />
+    <Compile Include="GlobalVariables.cs" />
     <Compile Include="Crypt.cs" />
     <Compile Include="Extensions.cs" />
     <Compile Include="Enums\TimeFrame.cs" />

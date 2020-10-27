@@ -52,10 +52,10 @@
     <Compile Include="GUI\SqlConnectionParametersWindow.Designer.cs">
       <DependentUpon>SqlConnectionParametersWindow.cs</DependentUpon>
     </Compile>
-    <Compile Include="Properties\Settings.Designer.cs">
+    <Compile Include="Properties\Resources.Designer.cs">
       <AutoGen>True</AutoGen>
-      <DesignTimeSharedInput>True</DesignTimeSharedInput>
-      <DependentUpon>Settings.settings</DependentUpon>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>Resources.resx</DependentUpon>
     </Compile>
     <Compile Include="SQL\IStorageSqlDriver.cs" />
     <Compile Include="SQL\CommonPostgresSqlDriver.cs" />
@@ -67,6 +67,10 @@
     <EmbeddedResource Include="GUI\SqlConnectionParametersWindow.resx">
       <DependentUpon>SqlConnectionParametersWindow.cs</DependentUpon>
     </EmbeddedResource>
+    <EmbeddedResource Include="Properties\Resources.resx">
+      <Generator>ResXFileCodeGenerator</Generator>
+      <LastGenOutput>Resources.Designer.cs</LastGenOutput>
+    </EmbeddedResource>
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\Graal.Library.Common\Graal.Library.Common.csproj">
@@ -76,10 +80,12 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="app.config" />
-    <None Include="Properties\Settings.settings">
-      <Generator>SettingsSingleFileGenerator</Generator>
-      <LastGenOutput>Settings.Designer.cs</LastGenOutput>
-    </None>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\sql_create_commands.txt" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\sql.txt" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

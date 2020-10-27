@@ -21,7 +21,7 @@ namespace Graal.Library.Common
         /// <summary>
         /// Изменение настроек хранилища
         /// </summary>
-        void ChangeStorageSettings();
+        void ChangeConnectionParameters();
 
         /// <summary>
         /// Событие изменения состояния хранилища

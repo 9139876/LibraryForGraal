@@ -23,7 +23,7 @@ namespace Graal.Library.Storage.Quotes
 
         #region AUX
 
-        public override bool SchemaExistAndCorrect()
+        public override bool SchemaExist()
         {
             var neededTables = new List<string>();
 
@@ -65,10 +65,10 @@ namespace Graal.Library.Storage.Quotes
 
         #region Initial
 
-        public override void CreateNeededTables()
+        public override void CreateGraalSchema()
         {
             //Создание схемы, если необходимо
-            base.CreateNeededTables();
+            base.CreateGraalSchema();
 
             var commandsString = Properties.Resources.CreateTablesCommands.Replace("%schema_name%", SchemaName);
 

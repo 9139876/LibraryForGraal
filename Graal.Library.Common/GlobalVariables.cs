@@ -18,6 +18,8 @@ namespace Graal.Library.Common
 
         static string graalDataPath;
 
+        public static Action<string> Debug { get; set; }
+
         public static string GraalDataPath
         {
             get

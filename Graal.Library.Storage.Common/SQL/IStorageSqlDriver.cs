@@ -14,9 +14,9 @@ namespace Graal.Library.Storage.Common
 
         bool ConnectionStatus { get; }
 
-        bool SchemaExistAndCorrect();
+        bool SchemaExist();
 
-        void CreateNeededTables();
+        void CreateGraalSchema();
 
         string DBName { get; }
 

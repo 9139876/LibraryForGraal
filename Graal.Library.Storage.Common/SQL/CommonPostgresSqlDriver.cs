@@ -7,6 +7,7 @@ using System.Text.RegularExpressions;
 using Graal.Library.Common.Quotes;
 using Graal.Library.Common.Enums;
 using Graal.Library.Common.Storage;
+using Graal.Library.Storage.Common.Properties;
 
 namespace Graal.Library.Storage.Common
 {
@@ -14,7 +15,7 @@ namespace Graal.Library.Storage.Common
     {
         protected readonly Dictionary<string, string> Names;
 
-        public string SchemaName => Environment.GetEnvironmentVariable("GraalSchemaName") ?? "graal";
+        public string SchemaName => Environment.GetEnvironmentVariable("GraalSchemaName", EnvironmentVariableTarget.User) ?? "graal";
 
         protected IDbConnection connection;
 
@@ -85,7 +86,7 @@ namespace Graal.Library.Storage.Common
             }
         }
 
-        public virtual bool SchemaExistAndCorrect()
+        public virtual bool SchemaExist()
         {
             using (var cmd = Connection.CreateCommand())
             {
@@ -99,20 +100,27 @@ namespace Graal.Library.Storage.Common
 
         #region Initial
 
-        public virtual void CreateNeededTables()
+        public virtual void CreateGraalSchema()
         {
-            if (!this.SchemaExistAndCorrect())
+            if (SchemaName.Length == 0)
+                throw new InvalidOperationException("Невозможно создать схему - имя схемы не может быть пустым!");
+
+            if (!new Regex(@"^[a-z][a-z0-9_]*$").IsMatch(SchemaName))
+                throw new InvalidOperationException($"Невозможно создать схему - имя схемы {SchemaName} содержит недопустимые символы!");
+
+            using (var cmd = Connection.CreateCommand())
             {
-                if (SchemaName.Length == 0)
-                    throw new InvalidOperationException("Невозможно создать схему - имя схемы не может быть пустым!");
-
-                if (!new Regex(@"^[a-z][a-z0-9_]*$").IsMatch(SchemaName))
-                    throw new InvalidOperationException($"Невозможно создать схему - имя схемы {SchemaName} содержит недопустимые символы!");
-
-                using (var cmd = Connection.CreateCommand())
+                foreach (var cmdText in Resources.sql_create_commands.Replace("%schema_name%", SchemaName).Split(new char[] { '|' }, StringSplitOptions.RemoveEmptyEntries))
                 {
-                    cmd.CommandText = $"create schema {SchemaName}";
-                    cmd.ExecuteNonQuery();
+                    try
+                    {
+                        cmd.CommandText = cmdText;
+                        cmd.ExecuteNonQuery();
+                    }
+                    catch (Exception ex)
+                    {
+                        throw new InvalidOperationException($"Ошибка создания хранилища - '{ex.Message}'{Environment.NewLine}Command text{Environment.NewLine}'{cmdText}'");
+                    }
                 }
             }
         }
@@ -124,12 +132,12 @@ namespace Graal.Library.Storage.Common
         /// <summary>
         /// Состояние соединения с БД
         /// </summary>
-        public bool ConnectionStatus => Connection != null && Connection.State == ConnectionState.Open;
+        public bool ConnectionStatus => Connection?.State == ConnectionState.Open;
 
         /// <summary>
         /// Имя базы данных, к которой произведено подключение
         /// </summary>
-        public string DBName => ConnectionStatus ? Connection.Database : string.Empty;
+        public string DBName => Connection?.Database ?? string.Empty;
 
         #endregion
     }

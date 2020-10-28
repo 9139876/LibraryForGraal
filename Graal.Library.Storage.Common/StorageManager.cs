@@ -7,24 +7,21 @@ using Graal.Library.Common.Quotes;
 using Graal.Library.Common.Enums;
 using Npgsql;
 using System.IO;
+using NLog;
+using NLog.Fluent;
 
 namespace Graal.Library.Storage.Common
 {
     public class StorageManager : IStorageManager
     {
-        protected const string ConnectionStringFile = @"\Storage\ConnectionString.txt";
+        const string ConnectionStringFile = "ConnectionString.txt";
 
-        readonly protected IStorageSqlDriver sqlDriver;
-
-        protected Action<string> Message, Debug;
+        readonly IStorageSqlDriver sqlDriver;
 
         public event Action StorageStatusChanged;
 
-        public StorageManager(Action<string> message, Action<string> debug)
+        public StorageManager()
         {
-            Message = message;
-            Debug = debug;
-
             sqlDriver = new CommonPostgresSqlDriver();
 
             sqlDriver.ConnectionStatusChange += StorageStatusChanged;
@@ -32,38 +29,9 @@ namespace Graal.Library.Storage.Common
             if (TryGetConnection(out IDbConnection connection, out string err))
                 sqlDriver.Connection = connection;
             else
-                Message?.Invoke(err);
+                AppVariables.Message?.Invoke(err);
 
         }
-
-        //protected bool TryGetConnection(out NpgsqlConnection connection, out string err)
-        //{
-        //    connection = null;
-
-        //    try
-        //    {
-        //        if (TryGetConnectionString(out string connStr, out err))
-        //        {
-        //            connection = new NpgsqlConnection(connStr);
-        //            connection.Open();
-        //            return true;
-        //        }
-        //        else
-        //            return false;
-        //    }
-        //    catch (Exception ex)
-        //    {
-        //        err = ex.Message;
-        //        connection?.Dispose();
-        //        return false;
-        //    }
-        //}
-
-        //protected void PrintException(Exception ex, string prefix = "")
-        //{
-        //    Message?.Invoke($"{prefix}: {ex.Message}");
-        //    Debug?.Invoke($"[{DateTime.Now}] {ex.Source} - {ex.GetType()} - {ex.Message} - {ex.StackTrace}");
-        //}
 
         public bool StorageStatus => sqlDriver.ConnectionStatus;
 
@@ -110,17 +78,15 @@ namespace Graal.Library.Storage.Common
 
                 if (paramsQueryWindow.DialogResult == System.Windows.Forms.DialogResult.OK)
                 {
-                    if (string.IsNullOrEmpty(GlobalVariables.GraalDataPath))
+                    if(!AppVariables.TryGetFullPath(GraalTypeFolder.Storage, ConnectionStringFile, out string path))
                     {
-                        Message?.Invoke("Не удалось получить значение имени папки данных Graal из переменной среды.");
+                        AppVariables.Message?.Invoke("Не удалось получить значение имени папки данных Graal из переменной среды.");
                         return;
                     }
 
-                    string path = GlobalVariables.GraalDataPath + ConnectionStringFile;
-
                     using (var fs = new FileStream(path, FileMode.Create))
                     using (var sW = new StreamWriter(fs))
-                        sW.Write(new Crypt(Environment.UserName, Debug).Encrypt(connectionString));
+                        sW.Write(new Crypt(Environment.UserName, AppVariables.Logger.Info).Encrypt(connectionString));
 
                     sqlDriver.Connection = connection;
                 }
@@ -149,13 +115,11 @@ namespace Graal.Library.Storage.Common
             connStr = string.Empty;
             err = string.Empty;
 
-            if (string.IsNullOrEmpty(GlobalVariables.GraalDataPath))
+            if (!AppVariables.TryGetFullPath(GraalTypeFolder.Storage, ConnectionStringFile, out string path))
             {
-                err = "Не удалось получить значение имени папки данных Graal из переменной среды.";
+                AppVariables.Message?.Invoke("Не удалось получить значение имени папки данных Graal из переменной среды.");
                 return false;
             }
-
-            string path = GlobalVariables.GraalDataPath + ConnectionStringFile;
 
             if (!File.Exists(path))
             {
@@ -175,7 +139,7 @@ namespace Graal.Library.Storage.Common
                 return false;
             }
 
-            connStr = new Crypt(Environment.UserName, GlobalVariables.Debug).Decrypt(encriptedConnectionString);
+            connStr = new Crypt(Environment.UserName, AppVariables.Logger.Debug).Decrypt(encriptedConnectionString);
             return true;
         }
 

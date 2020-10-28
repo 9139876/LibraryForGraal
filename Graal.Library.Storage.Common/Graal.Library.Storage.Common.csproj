@@ -31,6 +31,12 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
+    <Reference Include="NLog">
+      <HintPath>..\External\NLog.dll</HintPath>
+    </Reference>
+    <Reference Include="NLog.Windows.Forms">
+      <HintPath>..\External\NLog.Windows.Forms.dll</HintPath>
+    </Reference>
     <Reference Include="Npgsql">
       <HintPath>..\External\Npgsql.dll</HintPath>
     </Reference>

@@ -58,7 +58,7 @@ namespace Graal.Library.Common
                 case (TimeFrame.min1):
                     return diff.Minutes;
                 case (TimeFrame.min4):
-                    return (int)Math.Ceiling((float)diff.Minutes/4);
+                    return (int)Math.Ceiling((float)diff.Minutes / 4);
                 case (TimeFrame.H1):
                     return diff.Hours;
                 case (TimeFrame.D1):
@@ -75,6 +75,25 @@ namespace Graal.Library.Common
 
             throw new ArgumentException(nameof(timeFrame), $"Неизвестный таймфрейм - {timeFrame}");
         }
+
+        /// <summary>
+        /// Преобразует дату и время в стандартный строковый формат
+        /// </summary>
+        /// <param name="dt">Дата и время</param>
+        /// <returns></returns>
+        public static string DateTimeS(DateTime dt) => dt.ToString("s");
+
+        /// <summary>
+        /// Текущая дата и время в стандартном строковом формате
+        /// </summary>
+        /// <returns></returns>
+        public static string DateTimeNow() => DateTimeS(DateTime.Now);
+
+        /// <summary>
+        /// Текущая дата и время в стандартном строковом формате, пригодная для вставки в имя файла
+        /// </summary>
+        /// <returns></returns>
+        public static string DateTimeNowFile() => DateTimeNow().Replace(':', '-');
     }
 
     public class PointAndBrush

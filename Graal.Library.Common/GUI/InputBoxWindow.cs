@@ -32,7 +32,7 @@ namespace Graal.Library.Common.GUI
         /// <param name="no">Отображение кнопки "Нет"</param>
         /// <param name="strIn">Текст строки ввода</param>
         /// <param name="name">Имя окна</param>
-        /// <param name="hint">Подсказка</param>        
+        /// <param name="hint">Подсказка</param>
         public InputBoxWindow(
             bool onString = true,
             bool cancel = true,

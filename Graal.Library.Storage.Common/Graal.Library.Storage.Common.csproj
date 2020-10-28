@@ -63,11 +63,13 @@
       <DesignTime>True</DesignTime>
       <DependentUpon>Resources.resx</DependentUpon>
     </Compile>
+    <Compile Include="RoutinesNames.cs" />
     <Compile Include="SQL\IStorageSqlDriver.cs" />
     <Compile Include="SQL\CommonPostgresSqlDriver.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="SQLNames.cs" />
     <Compile Include="StorageManager.cs" />
+    <Compile Include="TablesNames.cs" />
   </ItemGroup>
   <ItemGroup>
     <EmbeddedResource Include="GUI\SqlConnectionParametersWindow.resx">

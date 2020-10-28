@@ -23,7 +23,7 @@ namespace Graal.Library.Storage.Quotes
 
         #region AUX
 
-        public override bool SchemaExist()
+        public new bool SchemaExist()
         {
             var neededTables = new List<string>();
 
@@ -49,7 +49,7 @@ namespace Graal.Library.Storage.Quotes
                         existingTables.Add(reader[0].ToString());
             }
 
-            foreach(var needTable in neededTables)
+            foreach (var needTable in neededTables)
             {
                 if (!Names.ContainsKey(needTable))
                     throw new Exception($"Неизвестный псевдоним имени таблицы {needTable} в командах инициализации БД");

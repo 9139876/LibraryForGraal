@@ -16,10 +16,10 @@ namespace Graal.Library.Storage.Common
 
         bool SchemaExist();
 
+        bool SchemaExistAndCorrect();
+
         void CreateGraalSchema();
 
         string DBName { get; }
-
-        string SchemaName { get; }
     }
 }

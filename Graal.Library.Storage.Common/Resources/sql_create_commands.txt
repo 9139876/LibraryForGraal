@@ -30,8 +30,8 @@ create table %schema_name%.tickertfs(
     ,parser_id int4 NOT NULL
     ,CONSTRAINT tickertfs_pkey PRIMARY KEY (id)
     ,CONSTRAINT tickertfs_un UNIQUE (period, tickerinfo_id)
-    ,CONSTRAINT tickertfs_info_fk FOREIGN KEY (tickerinfo_id) REFERENCES tickersinfoes(id) ON UPDATE CASCADE ON DELETE CASCADE
-    ,CONSTRAINT tickertfs_parser_fk FOREIGN KEY (parser_id) REFERENCES quotes_parser_expressions(id) ON UPDATE CASCADE ON DELETE CASCADE
+    ,CONSTRAINT tickertfs_info_fk FOREIGN KEY (tickerinfo_id) REFERENCES %schema_name%.tickersinfoes(id) ON UPDATE CASCADE ON DELETE CASCADE
+    ,CONSTRAINT tickertfs_parser_fk FOREIGN KEY (parser_id) REFERENCES %schema_name%.quotes_parser_expressions(id) ON UPDATE CASCADE ON DELETE CASCADE
 )|
 
 create table %schema_name%.quotes(
@@ -44,7 +44,7 @@ create table %schema_name%.quotes(
     ,"close" numeric(16,8) NOT NULL
     ,volume numeric(16,3) NOT NULL
     ,CONSTRAINT quotes_un UNIQUE (tickertf_id, datetime)
-    ,CONSTRAINT quotes_fk FOREIGN KEY (tickertf_id) REFERENCES tickertfs(id) ON UPDATE CASCADE ON DELETE CASCADE
+    ,CONSTRAINT quotes_fk FOREIGN KEY (tickertf_id) REFERENCES %schema_name%.tickertfs(id) ON UPDATE CASCADE ON DELETE CASCADE
 ) partition by list(tickertf_id)|
 
 create table %schema_name%.tendentions(
@@ -54,7 +54,7 @@ create table %schema_name%.tendentions(
     ,date_of_change timestamp NOT NULL
     ,CONSTRAINT tendentions_pkey PRIMARY KEY (id)
     ,CONSTRAINT tendentions_un UNIQUE (tickertf_id, type)
-    ,CONSTRAINT tendentions_fk FOREIGN KEY (tickertf_id) REFERENCES tickertfs(id) ON UPDATE CASCADE ON DELETE CASCADE
+    ,CONSTRAINT tendentions_fk FOREIGN KEY (tickertf_id) REFERENCES %schema_name%.tickertfs(id) ON UPDATE CASCADE ON DELETE CASCADE
 )|
 
 create table %schema_name%.simplepatterns(
@@ -65,7 +65,7 @@ create table %schema_name%.simplepatterns(
     ,tendention_id int4 NOT NULL
     ,CONSTRAINT simplepatterns_pkey PRIMARY KEY (id)
     ,CONSTRAINT simplepatterns_un UNIQUE (type, length, serialize, tendention_id)
-    ,CONSTRAINT simplepatterns_fk FOREIGN KEY (tendention_id) REFERENCES tendentions(id) ON UPDATE CASCADE ON DELETE CASCADE
+    ,CONSTRAINT simplepatterns_fk FOREIGN KEY (tendention_id) REFERENCES %schema_name%.tendentions(id) ON UPDATE CASCADE ON DELETE CASCADE
 )|
 
 create table %schema_name%.tfs(
@@ -75,18 +75,18 @@ create table %schema_name%.tfs(
 )|
 
 -- Создание секций под котировки
-create or replace function trig_ttf_add() returns trigger as $$
-begin    
-    execute concat('create table %schema_name%.quotes_part_', new.id, ' partition of %schema_name%.quotes (CONSTRAINT quotes_part_', new.id, '_pkey PRIMARY KEY (datetime)) for values in ( ', new.id, ' )');        
+create or replace function %schema_name%.trig_ttf_add() returns trigger as $$
+begin
+    execute concat('create table %schema_name%.quotes_part_', new.id, ' partition of %schema_name%.quotes (CONSTRAINT quotes_part_', new.id, '_pkey PRIMARY KEY (datetime)) for values in ( ', new.id, ' )');
     return new;
 end;
 $$ language plpgsql|
 
 create trigger ttf_add
-after insert on tickertfs for each row execute
+after insert on %schema_name%.tickertfs for each row execute
 procedure trig_ttf_add()|
 
-create or replace function trig_ttf_remove() returns trigger as $$
+create or replace function %schema_name%.trig_ttf_remove() returns trigger as $$
 begin
     execute concat('drop table if exists %schema_name%.quotes_part_', old.id);
     return old;
@@ -94,13 +94,13 @@ end;
 $$ language plpgsql|
 
 create trigger ttf_remove
-after delete on tickertfs for each row execute
+after delete on %schema_name%.tickertfs for each row execute
 procedure trig_ttf_remove()|
 
 
 -- Создание ttf при создании ti
 
-create or replace function trig_ti_add() returns trigger as $$
+create or replace function %schema_name%.trig_ti_add() returns trigger as $$
 declare
     tf int4;
 begin
@@ -114,11 +114,11 @@ end;
 $$ language plpgsql|
 
 create trigger ti_add
-after insert on tickersinfoes for each row execute
+after insert on %schema_name%.tickersinfoes for each row execute
 procedure trig_ti_add()|
 
 
-create or replace function trig_ti_remove() returns trigger as $$
+create or replace function %schema_name%.trig_ti_remove() returns trigger as $$
 declare
     tf int4;
 begin
@@ -132,5 +132,5 @@ end;
 $$ language plpgsql|
 
 create trigger ti_remove
-after delete on tickersinfoes for each row execute
+after delete on %schema_name%.tickersinfoes for each row execute
 procedure trig_ti_remove()|

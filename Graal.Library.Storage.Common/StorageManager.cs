@@ -29,8 +29,7 @@ namespace Graal.Library.Storage.Common
             if (TryGetConnection(out IDbConnection connection, out string err))
                 sqlDriver.Connection = connection;
             else
-                AppVariables.Message?.Invoke(err);
-
+                ApplicationGlobal.Logger.Error(err);
         }
 
         public bool StorageStatus => sqlDriver.ConnectionStatus;
@@ -38,10 +37,16 @@ namespace Graal.Library.Storage.Common
         public string StorageStatusS => StorageStatus ? $"Установлено соединение с хранилищем '{sqlDriver.DBName}'" : "Соединение с хранилищем не установлено";
 
         /// <summary>
-        /// Проверка сузествования схемы Graal
+        /// Проверка существования схемы Graal
         /// </summary>
         /// <returns></returns>
         public bool GraalSchemaExist() => sqlDriver.SchemaExist();
+
+        /// <summary>
+        /// Проверка существования схемы Graal и наличия в ней необходимых таблиц
+        /// </summary>
+        /// <returns></returns>
+        public bool GraalSchemaExistAndCorrect() => sqlDriver.SchemaExistAndCorrect();
 
         /// <summary>
         /// Создание схемы, таблиц, процедур
@@ -78,15 +83,12 @@ namespace Graal.Library.Storage.Common
 
                 if (paramsQueryWindow.DialogResult == System.Windows.Forms.DialogResult.OK)
                 {
-                    if(!AppVariables.TryGetFullPath(GraalTypeFolder.Storage, ConnectionStringFile, out string path))
-                    {
-                        AppVariables.Message?.Invoke("Не удалось получить значение имени папки данных Graal из переменной среды.");
+                    if (!ApplicationGlobal.TryGetFullPath(GraalTypeFolder.Storage, ConnectionStringFile, out string path))
                         return;
-                    }
 
                     using (var fs = new FileStream(path, FileMode.Create))
                     using (var sW = new StreamWriter(fs))
-                        sW.Write(new Crypt(Environment.UserName, AppVariables.Logger.Info).Encrypt(connectionString));
+                        sW.Write(new Crypt(Environment.UserName, ApplicationGlobal.Logger.Info).Encrypt(connectionString));
 
                     sqlDriver.Connection = connection;
                 }
@@ -94,6 +96,11 @@ namespace Graal.Library.Storage.Common
         }
 
         #region static
+
+        public static string GetGraalSchemaName() => Environment.GetEnvironmentVariable("GraalSchemaName", EnvironmentVariableTarget.User);
+
+        public static void SetGraalSchemaName(string name) => Environment.GetEnvironmentVariable("GraalSchemaName", EnvironmentVariableTarget.User);
+
         public static string CreateConnectionString(string host, string port, string user, string password, string dataBase)
         {
             return new NpgsqlConnectionStringBuilder()
@@ -115,9 +122,9 @@ namespace Graal.Library.Storage.Common
             connStr = string.Empty;
             err = string.Empty;
 
-            if (!AppVariables.TryGetFullPath(GraalTypeFolder.Storage, ConnectionStringFile, out string path))
+            if (!ApplicationGlobal.TryGetFullPath(GraalTypeFolder.Storage, ConnectionStringFile, out string path))
             {
-                AppVariables.Message?.Invoke("Не удалось получить значение имени папки данных Graal из переменной среды.");
+                err = "Не удалось получить значение имени папки данных Graal из переменной среды.";
                 return false;
             }
 
@@ -139,7 +146,7 @@ namespace Graal.Library.Storage.Common
                 return false;
             }
 
-            connStr = new Crypt(Environment.UserName, AppVariables.Logger.Debug).Decrypt(encriptedConnectionString);
+            connStr = new Crypt(Environment.UserName, ApplicationGlobal.Logger.Debug).Decrypt(encriptedConnectionString);
             return true;
         }
 

@@ -9,33 +9,33 @@ namespace Graal.Library.Common.Quotes
     {
         public Storage.StorageId StorageId { get; } = new Storage.StorageId();
 
-        public TickerTF ParentTickerTF { get; private set; }
+        public TickerTF ParentTickerTF { get; }
 
-        public DateTime Date { get; private set; }
+        public DateTime Date { get; }
 
         public string DateS => Date.ToString("G");
 
-        public double Open { get; private set; }
+        public decimal Open { get; }
 
-        public string OpenS => Open.ToString(ApplicationGlobal.NFI);
+        public string OpenS => Open.ToString(AppGlobal.NFI);
 
-        public double Hi { get; private set; }
+        public decimal Hi { get; }
 
-        public string HiS => Hi.ToString(ApplicationGlobal.NFI);
+        public string HiS => Hi.ToString(AppGlobal.NFI);
 
-        public double Low { get; private set; }
+        public decimal Low { get; }
 
-        public string LowS => Low.ToString(ApplicationGlobal.NFI);
+        public string LowS => Low.ToString(AppGlobal.NFI);
 
-        public double Close { get; private set; }
+        public decimal Close { get; }
 
-        public string CloseS=> Close.ToString(ApplicationGlobal.NFI);
+        public string CloseS => Close.ToString(AppGlobal.NFI);
 
-        public double Volume { get; private set; }
+        public decimal Volume { get; }
 
-        public string VolumeS => Volume.ToString(ApplicationGlobal.NFI);
+        public string VolumeS => Volume.ToString(AppGlobal.NFI);
 
-        public Quote(TickerTF tickerTF, DateTime date, double open, double hi, double low, double close, double volume, int storageId = Storage.StorageId.DefaultValue)
+        public Quote(TickerTF tickerTF, DateTime date, decimal open, decimal hi, decimal low, decimal close, decimal volume, int storageId = Storage.StorageId.DefaultValue)
         {
             ParentTickerTF = tickerTF;
             Date = date;
@@ -54,7 +54,7 @@ namespace Graal.Library.Common.Quotes
             return string.Format("[{0, -12}]   o:{1, -8} h:{2, -8} l:{3, -8} c:{4, -8}", Date.ToString("g"), Formatting(Open), Formatting(Hi), Formatting(Low), Formatting(Close));
         }
 
-        string Formatting(double number) => number > 5 ? number.ToString("f2") : number.ToString("f4");
+        string Formatting(decimal number) => number > 5 ? number.ToString("f2") : number.ToString("f4");
 
         public override bool Equals(object obj)
         {

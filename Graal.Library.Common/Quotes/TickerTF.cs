@@ -13,9 +13,9 @@ namespace Graal.Library.Common.Quotes
     /// </summary>
     public class TickerTF
     {
-        public static readonly DateTime FirstDate = new DateTime(1995, 1, 1);
+        //public static readonly DateTime FirstDate = new DateTime(1995, 1, 1);
 
-        public Storage.StorageId StorageId { get; } = new Storage.StorageId();
+        //public Storage.StorageId StorageId { get; } = new Storage.StorageId();
 
         public TimeFrame TimeFrame { get; private set; }
 
@@ -38,8 +38,8 @@ namespace Graal.Library.Common.Quotes
             if (!string.IsNullOrEmpty(tradingTimeRulesSerialize))
                 TradingTimeRules = new TradingTimeRules(this, tradingTimeRulesSerialize);
 
-            if (storageId >= 0)
-                StorageId.Set(storageId);
+            //if (storageId >= 0)
+            //    StorageId.Set(storageId);
         }
 
         public void RefreshQuotes(IEnumerable<Quote> storageQuotes)
@@ -67,13 +67,13 @@ namespace Graal.Library.Common.Quotes
             return $"{ParentTickerInfo.MarketTitle}_{ParentTickerInfo.Title}_{TimeFrame.ToString()}";
         }
 
-        public DateTime GetFirstDate() => Quotes.FirstOrDefault()?.Date ?? FirstDate;
+        public DateTime GetFirstDate() => Quotes.FirstOrDefault()?.Date ?? AppGlobal.FIRST_DATE;
 
-        public DateTime GetLastDate() => Quotes.LastOrDefault()?.Date ?? FirstDate;
+        public DateTime GetLastDate() => Quotes.LastOrDefault()?.Date ?? AppGlobal.FIRST_DATE;
 
-        public double GetMinPrice() => Quotes.Min(q => q.Low);
+        public decimal GetMinPrice() => Quotes.Min(q => q.Low);
 
-        public double GetMaxPrice() => Quotes.Max(q => q.Hi);
+        public decimal GetMaxPrice() => Quotes.Max(q => q.Hi);
 
         public int GetQuotesCount() => Quotes.Count;
 

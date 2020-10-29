@@ -4,11 +4,13 @@ create schema %schema_name%|
 
 create table %schema_name%.quotes_parser_expressions(
     id int4 NOT NULL GENERATED ALWAYS AS IDENTITY
-    ,specification text NULL
+    ,name text NOT NULL
+    ,specification text NOT NULL
     ,CONSTRAINT quotes_parser_expressions_pkey PRIMARY KEY (id)
+    ,CONSTRAINT quotes_parser_expressions_un UNIQUE (name)
 )|
 
-insert into %schema_name%.quotes_parser_expressions(specification) values (null)|
+insert into %schema_name%.quotes_parser_expressions(name, specification) values ('empty', '')|
 
 create table %schema_name%.tickersinfoes(
     id int4 NOT NULL GENERATED ALWAYS AS IDENTITY
@@ -21,17 +23,17 @@ create table %schema_name%.tickersinfoes(
     ,CONSTRAINT tickersinfoes_un UNIQUE (ticker_title, market_title)
 )|
 
-create table %schema_name%.tickertfs(
+create table %schema_name%.tickerstfs(
     id int4 NOT NULL GENERATED ALWAYS AS IDENTITY
     ,tickerinfo_id int4 NOT NULL
     ,"period" int4 NOT NULL
     ,trading_time_rules text NOT NULL
     ,get_url text null
     ,parser_id int4 NOT NULL
-    ,CONSTRAINT tickertfs_pkey PRIMARY KEY (id)
-    ,CONSTRAINT tickertfs_un UNIQUE (period, tickerinfo_id)
-    ,CONSTRAINT tickertfs_info_fk FOREIGN KEY (tickerinfo_id) REFERENCES %schema_name%.tickersinfoes(id) ON UPDATE CASCADE ON DELETE CASCADE
-    ,CONSTRAINT tickertfs_parser_fk FOREIGN KEY (parser_id) REFERENCES %schema_name%.quotes_parser_expressions(id) ON UPDATE CASCADE ON DELETE CASCADE
+    ,CONSTRAINT tickerstfs_pkey PRIMARY KEY (id)
+    ,CONSTRAINT tickerstfs_un UNIQUE (period, tickerinfo_id)
+    ,CONSTRAINT tickerstfs_info_fk FOREIGN KEY (tickerinfo_id) REFERENCES %schema_name%.tickersinfoes(id) ON UPDATE CASCADE ON DELETE CASCADE
+    ,CONSTRAINT tickerstfs_parser_fk FOREIGN KEY (parser_id) REFERENCES %schema_name%.quotes_parser_expressions(id) ON UPDATE CASCADE ON DELETE CASCADE
 )|
 
 create table %schema_name%.quotes(
@@ -44,7 +46,7 @@ create table %schema_name%.quotes(
     ,"close" numeric(16,8) NOT NULL
     ,volume numeric(16,3) NOT NULL
     ,CONSTRAINT quotes_un UNIQUE (tickertf_id, datetime)
-    ,CONSTRAINT quotes_fk FOREIGN KEY (tickertf_id) REFERENCES %schema_name%.tickertfs(id) ON UPDATE CASCADE ON DELETE CASCADE
+    ,CONSTRAINT quotes_fk FOREIGN KEY (tickertf_id) REFERENCES %schema_name%.tickerstfs(id) ON UPDATE CASCADE ON DELETE CASCADE
 ) partition by list(tickertf_id)|
 
 create table %schema_name%.tendentions(
@@ -54,7 +56,7 @@ create table %schema_name%.tendentions(
     ,date_of_change timestamp NOT NULL
     ,CONSTRAINT tendentions_pkey PRIMARY KEY (id)
     ,CONSTRAINT tendentions_un UNIQUE (tickertf_id, type)
-    ,CONSTRAINT tendentions_fk FOREIGN KEY (tickertf_id) REFERENCES %schema_name%.tickertfs(id) ON UPDATE CASCADE ON DELETE CASCADE
+    ,CONSTRAINT tendentions_fk FOREIGN KEY (tickertf_id) REFERENCES %schema_name%.tickerstfs(id) ON UPDATE CASCADE ON DELETE CASCADE
 )|
 
 create table %schema_name%.simplepatterns(
@@ -83,7 +85,7 @@ end;
 $$ language plpgsql|
 
 create trigger ttf_add
-after insert on %schema_name%.tickertfs for each row execute
+after insert on %schema_name%.tickerstfs for each row execute
 procedure trig_ttf_add()|
 
 create or replace function %schema_name%.trig_ttf_remove() returns trigger as $$
@@ -94,7 +96,7 @@ end;
 $$ language plpgsql|
 
 create trigger ttf_remove
-after delete on %schema_name%.tickertfs for each row execute
+after delete on %schema_name%.tickerstfs for each row execute
 procedure trig_ttf_remove()|
 
 
@@ -106,7 +108,7 @@ declare
 begin
     for tf in select value from %schema_name%.tfs
     loop
-        execute concat('insert into %schema_name%.tickertfs(tickerinfo_id, period, trading_time_rules, get_url, parser_id) values(', new.id, ', ', tf, ', null, null, 1)');
+        execute concat('insert into %schema_name%.tickerstfs(tickerinfo_id, period, trading_time_rules, get_url, parser_id) values(', new.id, ', ', tf, ', null, null, 1)');
     end loop;
     
     return new;
@@ -124,7 +126,7 @@ declare
 begin
     for tf in select value from %schema_name%.tfs
     loop
-        execute concat('delete from %schema_name%.tickertfs where tickerinfo_id=', old.id, ' and period=', tf);
+        execute concat('delete from %schema_name%.tickerstfs where tickerinfo_id=', old.id, ' and period=', tf);
     end loop;
     
     return old;

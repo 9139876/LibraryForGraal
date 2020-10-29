@@ -115,7 +115,7 @@ namespace Graal.Library.Storage.Common
             {
                 if (!existingTables.Contains(needTable))
                 {
-                    ApplicationGlobal.Logger.Debug($"Таблица {needTable} не найдена в БД");
+                    AppGlobal.Logger.Debug($"Таблица {needTable} не найдена в БД");
                     return false;
                 }
             }
@@ -136,7 +136,7 @@ namespace Graal.Library.Storage.Common
             {
                 if (!existingroutines.Contains(needRoutine))
                 {
-                    ApplicationGlobal.Logger.Debug($"Хранимая процедура {needRoutine} не найдена в БД");
+                    AppGlobal.Logger.Debug($"Хранимая процедура {needRoutine} не найдена в БД");
                     return false;
                 }
             }
@@ -158,7 +158,7 @@ namespace Graal.Library.Storage.Common
 
             using (var cmd = Connection.CreateCommand())
             {
-                ApplicationGlobal.Logger.Trace("Создание схемы Graal");
+                AppGlobal.Logger.Trace("Создание схемы Graal");
 
                 foreach (var cmdText in Resources.sql_create_commands
                                                     .Replace("%schema_name%", SchemaName)
@@ -167,19 +167,19 @@ namespace Graal.Library.Storage.Common
                 {
                     try
                     {
-                        ApplicationGlobal.Logger.Trace(cmdText);
+                        AppGlobal.Logger.Trace(cmdText);
                         cmd.CommandText = cmdText;
                         cmd.ExecuteNonQuery();
                     }
                     catch (Exception ex)
                     {
                         var error = $"Ошибка создания хранилища - '{ex.Message}'{Environment.NewLine}Command text{Environment.NewLine}'{cmdText}'";
-                        ApplicationGlobal.Logger.Error(error);
+                        AppGlobal.Logger.Error(error);
                         throw new InvalidOperationException(error);
                     }
                 }
 
-                ApplicationGlobal.Logger.Trace("Создание схемы Graal завершено");
+                AppGlobal.Logger.Trace("Создание схемы Graal завершено");
             }
         }
 
@@ -199,6 +199,6 @@ namespace Graal.Library.Storage.Common
 
         #endregion
 
-        public static string SchemaName => Environment.GetEnvironmentVariable(ApplicationGlobal.EnvironmentVariableGraalSchemaName, EnvironmentVariableTarget.User);
+        public static string SchemaName => Environment.GetEnvironmentVariable(AppGlobal.EnvironmentVariableGraalSchemaName, EnvironmentVariableTarget.User);
     }
 }

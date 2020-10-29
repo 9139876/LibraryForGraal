@@ -72,7 +72,7 @@
     <Compile Include="GUI\InfoWindow.Designer.cs">
       <DependentUpon>InfoWindow.cs</DependentUpon>
     </Compile>
-    <Compile Include="ApplicationGlobal.cs" />
+    <Compile Include="AppGlobal.cs" />
     <Compile Include="Crypt.cs" />
     <Compile Include="Extensions.cs" />
     <Compile Include="Enums\TimeFrame.cs" />

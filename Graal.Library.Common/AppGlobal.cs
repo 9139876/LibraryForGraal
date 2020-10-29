@@ -10,7 +10,7 @@ using System.Windows.Forms;
 
 namespace Graal.Library.Common
 {
-    public static class ApplicationGlobal
+    public static class AppGlobal
     {
         #region noMutable
 

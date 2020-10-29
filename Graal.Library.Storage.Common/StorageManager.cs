@@ -29,7 +29,7 @@ namespace Graal.Library.Storage.Common
             if (TryGetConnection(out IDbConnection connection, out string err))
                 sqlDriver.Connection = connection;
             else
-                ApplicationGlobal.Logger.Error(err);
+                AppGlobal.Logger.Error(err);
         }
 
         public bool StorageStatus => sqlDriver.ConnectionStatus;
@@ -83,12 +83,12 @@ namespace Graal.Library.Storage.Common
 
                 if (paramsQueryWindow.DialogResult == System.Windows.Forms.DialogResult.OK)
                 {
-                    if (!ApplicationGlobal.TryGetFullPath(GraalTypeFolder.Storage, ConnectionStringFile, out string path))
+                    if (!AppGlobal.TryGetFullPath(GraalTypeFolder.Storage, ConnectionStringFile, out string path))
                         return;
 
                     using (var fs = new FileStream(path, FileMode.Create))
                     using (var sW = new StreamWriter(fs))
-                        sW.Write(new Crypt(Environment.UserName, ApplicationGlobal.Logger.Info).Encrypt(connectionString));
+                        sW.Write(new Crypt(Environment.UserName, AppGlobal.Logger.Info).Encrypt(connectionString));
 
                     sqlDriver.Connection = connection;
                 }
@@ -122,7 +122,7 @@ namespace Graal.Library.Storage.Common
             connStr = string.Empty;
             err = string.Empty;
 
-            if (!ApplicationGlobal.TryGetFullPath(GraalTypeFolder.Storage, ConnectionStringFile, out string path))
+            if (!AppGlobal.TryGetFullPath(GraalTypeFolder.Storage, ConnectionStringFile, out string path))
             {
                 err = "Не удалось получить значение имени папки данных Graal из переменной среды.";
                 return false;
@@ -146,7 +146,7 @@ namespace Graal.Library.Storage.Common
                 return false;
             }
 
-            connStr = new Crypt(Environment.UserName, ApplicationGlobal.Logger.Debug).Decrypt(encriptedConnectionString);
+            connStr = new Crypt(Environment.UserName, AppGlobal.Logger.Debug).Decrypt(encriptedConnectionString);
             return true;
         }
 

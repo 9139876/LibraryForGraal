@@ -10,7 +10,7 @@ namespace Graal.Library.Storage.Common
     {
         quotes_parser_expressions,
         tickersinfoes,
-        tickertfs,
+        tickerstfs,
         quotes,
         tendentions,
         simplepatterns,

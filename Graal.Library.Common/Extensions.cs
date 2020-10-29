@@ -2,34 +2,32 @@
 using System.Collections.Generic;
 using System.Drawing;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Graal.Library.Common
 {
     public static class Extensions
     {
-        public static bool EqualsAllElements<T>(this List<T> list1, List<T> list2)
+        public static bool EqualsAllElements<T>(this IEnumerable<T> collection1, IEnumerable<T> collection2)
         {
-            if (list1 == null || list2 == null || list1.Count != list2.Count)
+            if (collection1 == null || collection2 == null || collection1.Count() != collection2.Count())
                 return false;
 
-            for (int i = 0; i < list1.Count; i++)
-                if (!list1[i].Equals(list2[i]))
+            for (int i = 0; i < collection1.Count(); i++)
+                if (!collection1.ElementAt(i).Equals(collection2.ElementAt(i)))
                     return false;
 
             return true;
         }
 
-        public static int GetTrueHashCode<T>(this List<T> list)
+        public static int GetTrueHashCode<T>(this IEnumerable<T> collection)
         {
-            if (list == null)
+            if (collection == null)
                 return -1;
 
             var hashCode = 301429547;
 
-            foreach (var l in list)
-                hashCode = hashCode * -1521134295 + l.GetHashCode();
+            foreach (var item in collection)
+                hashCode = hashCode * -1521134295 + item.GetHashCode();
 
             return hashCode;
         }

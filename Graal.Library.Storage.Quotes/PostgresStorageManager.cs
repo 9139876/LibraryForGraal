@@ -14,14 +14,14 @@ namespace Graal.Library.Storage.Quotes
     {
         readonly IStorageQuotesSqlDriver quotesSqlDriver;
 
-        public PostgresStorageManager(Action<string> message, Action<string> debug) : base(message, debug)
+        public PostgresStorageManager(Action<string> message, Action<string> debug) //: base(message, debug)
         {
             quotesSqlDriver = new QuotesPostgresSqlDriver();
 
-            if (sqlDriver.Connection != null)
-                quotesSqlDriver.Connection = sqlDriver.Connection;
-            else if (TryGetConnection(out NpgsqlConnection connection))
-                quotesSqlDriver.Connection = connection;
+            //if (sqlDriver.Connection != null)
+            //    quotesSqlDriver.Connection = sqlDriver.Connection;
+            //else if (TryGetConnection(out NpgsqlConnection connection))
+            //    quotesSqlDriver.Connection = connection;
         }
 
         #region TickersToStorage

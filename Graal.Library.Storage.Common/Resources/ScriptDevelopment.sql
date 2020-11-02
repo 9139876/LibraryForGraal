@@ -1,0 +1,191 @@
+drop schema if exists new_graal cascade;
+
+create schema new_graal;
+
+
+create table new_graal.quotes_parser_expressions(
+    id int4 NOT NULL GENERATED ALWAYS AS IDENTITY
+    ,specification text NULL
+    ,CONSTRAINT quotes_parser_expressions_pkey PRIMARY KEY (id)
+);
+
+insert into new_graal.quotes_parser_expressions(specification) values (null);
+
+create table new_graal.tickersinfoes(
+    id int4 NOT NULL GENERATED ALWAYS AS IDENTITY    
+    ,ticker_title text NOT NULL    
+    ,market_title text NOT NULL
+    ,currency text NULL
+    ,volume_code text NULL
+    ,auto_update bool NOT NULL DEFAULT false    
+    ,CONSTRAINT tickersinfoes_pkey PRIMARY KEY (id)
+    ,CONSTRAINT tickersinfoes_un UNIQUE (ticker_title, market_title)
+);
+
+create table new_graal.tickertfs(
+    id int4 NOT NULL GENERATED ALWAYS AS IDENTITY
+    ,tickerinfo_id int4 NOT NULL
+    ,"period" int4 NOT NULL
+    ,trading_time_rules text NULL
+    ,get_url text NULL
+    ,parser_id int4 NOT NULL
+    ,CONSTRAINT tickertfs_pkey PRIMARY KEY (id)
+    ,CONSTRAINT tickertfs_un UNIQUE (period, tickerinfo_id)
+    ,CONSTRAINT tickertfs_info_fk FOREIGN KEY (tickerinfo_id) REFERENCES tickersinfoes(id) ON UPDATE CASCADE ON DELETE CASCADE
+    ,CONSTRAINT tickertfs_parser_fk FOREIGN KEY (parser_id) REFERENCES quotes_parser_expressions(id) ON UPDATE CASCADE ON DELETE CASCADE
+);
+
+drop table new_graal.quotes;
+
+create table new_graal.quotes(
+    id int4 NOT NULL GENERATED ALWAYS AS IDENTITY
+    ,tickertf_id int4 NOT NULL
+    ,datetime timestamp NOT NULL
+    ,"open" numeric(16,8) NOT NULL
+    ,high numeric(16,8) NOT NULL
+    ,low numeric(16,8) NOT NULL
+    ,"close" numeric(16,8) NOT NULL
+    ,volume numeric(16,3) NOT NULL
+    ,CONSTRAINT quotes_un UNIQUE (tickertf_id, datetime)
+    ,CONSTRAINT quotes_fk FOREIGN KEY (tickertf_id) REFERENCES tickertfs(id) ON UPDATE CASCADE ON DELETE CASCADE
+) partition by list(tickertf_id);
+
+create table new_graal.tendentions(
+    id int4 NOT NULL GENERATED ALWAYS AS IDENTITY,
+    tickertf_id int4 NOT NULL,
+    "type" int4 NOT NULL,
+    date_of_change timestamp NOT NULL,
+    CONSTRAINT tendentions_pkey PRIMARY KEY (id),
+    CONSTRAINT tendentions_un UNIQUE (tickertf_id, type),
+    CONSTRAINT tendentions_fk FOREIGN KEY (tickertf_id) REFERENCES tickertfs(id) ON UPDATE CASCADE ON DELETE CASCADE
+);
+
+create table new_graal.simplepatterns(
+    id int4 NOT NULL GENERATED ALWAYS AS IDENTITY,
+    "type" int4 NOT NULL,
+    length int4 NOT NULL,
+    serialize text NOT NULL,
+    tendention_id int4 NOT NULL,
+    CONSTRAINT simplepatterns_pkey PRIMARY KEY (id),
+    CONSTRAINT simplepatterns_un UNIQUE (type, length, serialize, tendention_id),
+    CONSTRAINT simplepatterns_fk FOREIGN KEY (tendention_id) REFERENCES tendentions(id) ON UPDATE CASCADE ON DELETE CASCADE
+);
+
+create table new_graal.tfs(
+    value int4 NOT NULL
+    ,description text NOT NULL
+    ,CONSTRAINT tfs_pkey PRIMARY KEY (value)
+);
+
+create or replace function trig_ttf_add() returns trigger as $$
+begin    
+    execute concat('create table new_graal.quotes_part_', new.id, ' partition of new_graal.quotes (CONSTRAINT quotes_part_', new.id, '_pkey PRIMARY KEY (datetime)) for values in ( ', new.id, ' )');        
+    return new;
+end;
+$$ language plpgsql;
+
+create table new_graal.quotes_part_21 partition of new_graal.quotes (CONSTRAINT new_graal.quotes_part_21_pkey PRIMARY KEY (datetime)) for values in ( 21 );
+
+create trigger ttf_add
+after insert on tickertfs for each row execute
+procedure trig_ttf_add();
+
+create or replace function trig_ttf_remove() returns trigger as $$
+begin    
+    execute concat('drop table if exists new_graal.quotes_part_', old.id);
+    return old;
+end;
+$$ language plpgsql;
+
+create trigger ttf_remove
+after delete on tickertfs for each row execute
+procedure trig_ttf_remove();
+
+
+create or replace function trig_ti_add() returns trigger as $$
+declare
+    tf int4;
+begin
+    for tf in select value from new_graal.tfs
+    loop
+        execute concat('insert into new_graal.tickertfs(tickerinfo_id, period, trading_time_rules, get_url, parser_id) values(', new.id, ', ', tf, ', null, null, 1)');
+    end loop;
+    
+    return new;
+end;
+$$ language plpgsql;
+
+create trigger ti_add
+after insert on tickersinfoes for each row execute
+procedure trig_ti_add();
+
+
+create or replace function trig_ti_remove() returns trigger as $$
+declare
+    tf int4;
+begin
+    for tf in select value from new_graal.tfs
+    loop
+        execute concat('delete from new_graal.tickertfs where tickerinfo_id=', old.id, ' and period=', tf);
+    end loop;
+    
+    return old;
+end;
+$$ language plpgsql;
+
+create trigger ti_remove
+after delete on tickersinfoes for each row execute
+procedure trig_ti_remove();
+
+
+select count(distinct(table_schema)) from information_schema.tables where table_schema='testt';
+
+select table_name from information_schema.tables where table_schema='testt';
+
+select * from information_schema. where table_schema='testt';
+
+SELECT routine_name FROM information_schema.routines WHERE specific_schema='testt';
+
+
+
+
+
+
+SELECT routines.routine_name
+FROM information_schema.routines
+    LEFT JOIN information_schema.parameters ON routines.specific_name=parameters.specific_name
+WHERE routines.specific_schema='testt'
+ORDER BY routines.routine_name, parameters.ordinal_position;
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+CREATE OR REPLACE FUNCTION testt.get_all_quotes_parsers()
+ RETURNS TABLE(name text, specification text)
+ LANGUAGE sql
+AS $function$ select name, specification from testt.quotes_parser_expressions where name != 'empty' $function$
+;
+
+select * from testt.get_all_quotes_parsers();

@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Data;
 using System.Threading.Tasks;
+using System.Data.Common;
 
 namespace Graal.Library.Storage.Common
 {
@@ -21,5 +22,7 @@ namespace Graal.Library.Storage.Common
         void CreateGraalSchema();
 
         string DBName { get; }
+
+        DbDataAdapter QuotesParserAdapter { get; }
     }
 }

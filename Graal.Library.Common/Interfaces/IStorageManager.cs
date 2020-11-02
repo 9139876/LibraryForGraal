@@ -1,10 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Data;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Graal.Library.Common
+namespace Graal.Library.Common.Interfaces
 {
     public interface IStorageManager
     {
@@ -38,5 +39,7 @@ namespace Graal.Library.Common
         /// Создание схемы для Грааля.
         /// </summary>
         void GraalSchemaCreate();
+
+        IGraalDataSet QuotesParsersTable { get; }
     }
 }

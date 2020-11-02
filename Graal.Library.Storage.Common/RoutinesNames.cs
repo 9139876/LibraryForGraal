@@ -11,6 +11,7 @@ namespace Graal.Library.Storage.Common
         trig_ttf_add,
         trig_ttf_remove,
         trig_ti_add,
-        trig_ti_remove
+        trig_ti_remove,
+        get_all_quotes_parsers
     }
 }

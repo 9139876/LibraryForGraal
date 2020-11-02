@@ -9,6 +9,7 @@ using Npgsql;
 using System.IO;
 using NLog;
 using NLog.Fluent;
+using Graal.Library.Common.Interfaces;
 
 namespace Graal.Library.Storage.Common
 {
@@ -92,6 +93,20 @@ namespace Graal.Library.Storage.Common
 
                     sqlDriver.Connection = connection;
                 }
+            }
+        }
+
+        IGraalDataSet quotesParsersTable;
+        public IGraalDataSet QuotesParsersTable
+        {
+            get
+            {
+                if (quotesParsersTable == null)
+                {
+                    quotesParsersTable = new GraalDataSet(sqlDriver.QuotesParserAdapter);
+                }
+
+                return quotesParsersTable;
             }
         }
 
@@ -180,6 +195,7 @@ namespace Graal.Library.Storage.Common
                 return false;
             }
         }
+
         #endregion
     }
 }

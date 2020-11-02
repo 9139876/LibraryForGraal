@@ -52,6 +52,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="GraalDataSet.cs" />
     <Compile Include="GUI\SqlConnectionParametersWindow.cs">
       <SubType>Form</SubType>
     </Compile>
@@ -94,6 +95,9 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="Resources\sql.txt" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\ScriptDevelopment.sql" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

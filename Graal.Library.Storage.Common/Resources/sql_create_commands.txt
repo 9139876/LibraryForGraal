@@ -5,12 +5,12 @@ create schema %schema_name%|
 create table %schema_name%.quotes_parser_expressions(
     id int4 NOT NULL GENERATED ALWAYS AS IDENTITY
     ,name text NOT NULL
-    ,specification text NOT NULL
+    ,serialize text NOT NULL
     ,CONSTRAINT quotes_parser_expressions_pkey PRIMARY KEY (id)
     ,CONSTRAINT quotes_parser_expressions_un UNIQUE (name)
 )|
 
-insert into %schema_name%.quotes_parser_expressions(name, specification) values ('empty', '')|
+insert into %schema_name%.quotes_parser_expressions(name, serialize) values ('empty', '')|
 
 create table %schema_name%.tickersinfoes(
     id int4 NOT NULL GENERATED ALWAYS AS IDENTITY
@@ -136,3 +136,9 @@ $$ language plpgsql|
 create trigger ti_remove
 after delete on %schema_name%.tickersinfoes for each row execute
 procedure trig_ti_remove()|
+
+-- Работа с парсером котировок
+CREATE OR REPLACE FUNCTION %schema_name%.get_all_quotes_parsers()
+ RETURNS TABLE(name text, serialize text)
+ LANGUAGE sql
+AS $function$ select name, serialize from %schema_name%.quotes_parser_expressions where name != 'empty' $function$|

@@ -9,6 +9,8 @@ using Graal.Library.Common.Enums;
 using Graal.Library.Common.Storage;
 using Graal.Library.Storage.Common.Properties;
 using Graal.Library.Common;
+using Npgsql;
+using System.Data.Common;
 
 namespace Graal.Library.Storage.Common
 {
@@ -131,7 +133,7 @@ namespace Graal.Library.Storage.Common
                     while (reader.Read())
                         existingroutines.Add(reader[0].ToString());
             }
-            
+
             foreach (var needRoutine in Enum.GetNames(typeof(RoutinesNames)))
             {
                 if (!existingroutines.Contains(needRoutine))
@@ -199,6 +201,34 @@ namespace Graal.Library.Storage.Common
 
         #endregion
 
+        #region QuotesParser
+
+        DbDataAdapter quotesParserAdapter;
+        public DbDataAdapter QuotesParserAdapter
+        {
+            get
+            {
+                if (quotesParserAdapter == null)
+                {
+                    quotesParserAdapter = new NpgsqlDataAdapter()
+                    {
+                        SelectCommand = new NpgsqlCommand($"select * from {SchemaName}.{RoutinesNames.get_all_quotes_parsers}()", connection as NpgsqlConnection),
+                        InsertCommand = new NpgsqlCommand("", connection as NpgsqlConnection),
+                        UpdateCommand = new NpgsqlCommand("", connection as NpgsqlConnection),
+                        DeleteCommand = new NpgsqlCommand("", connection as NpgsqlConnection)
+                    };
+                }
+
+                return quotesParserAdapter;
+            }
+        }
+
+        #endregion
+
+        #region static
+
         public static string SchemaName => Environment.GetEnvironmentVariable(AppGlobal.EnvironmentVariableGraalSchemaName, EnvironmentVariableTarget.User);
+
+        #endregion
     }
 }

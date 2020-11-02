@@ -8,7 +8,7 @@ namespace Graal.Library.Common
     /// <summary>
     /// ОБщий интерфейс менеджера хранилища данных
     /// </summary>
-    public interface IStorageQuotesManager : IStorageManager
+    public interface IStorageQuotesManager //: IStorageManager
     {
         #region TickerInfo
         /// <summary>

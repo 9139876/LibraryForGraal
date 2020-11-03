@@ -40,6 +40,12 @@ namespace Graal.Library.Common.Interfaces
         /// </summary>
         void GraalSchemaCreate();
 
-        IGraalDataSet QuotesParsersTable { get; }
+        #region parsers
+        Dictionary<string, string> GetAllParsers();
+
+        void RenameParser(string from, string to);
+
+        void AddParser(string name, string serialize);
+        #endregion
     }
 }

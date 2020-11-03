@@ -138,7 +138,15 @@ after delete on %schema_name%.tickersinfoes for each row execute
 procedure trig_ti_remove()|
 
 -- Работа с парсером котировок
-CREATE OR REPLACE FUNCTION %schema_name%.get_all_quotes_parsers()
+CREATE OR REPLACE FUNCTION %schema_name%.parsers_get_all()
  RETURNS TABLE(name text, serialize text)
  LANGUAGE sql
 AS $function$ select name, serialize from %schema_name%.quotes_parser_expressions where name != 'empty' $function$|
+
+CREATE OR REPLACE PROCEDURE %schema_name%.parsers_rename_parser(old_name text, new_name text)
+ LANGUAGE sql
+AS $procedure$ update %schema_name%.quotes_parser_expressions set name = new_name where name = old_name $procedure$|
+
+CREATE OR REPLACE PROCEDURE %schema_name%.parsers_add_parser(_name text, _serialize text)
+ LANGUAGE sql
+AS $procedure$ insert into %schema_name%.quotes_parser_expressions (name, serialize) values (_name, _serialize) $procedure$|

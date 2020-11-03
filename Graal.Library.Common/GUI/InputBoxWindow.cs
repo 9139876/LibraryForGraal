@@ -56,6 +56,9 @@ namespace Graal.Library.Common.GUI
             Text = name;
             Lbl_Hint.Text = hint;
             Txt_Text.Text = strIn;
+
+            if (hint.Split(new string[] { Environment.NewLine }, StringSplitOptions.None).Length > 1)
+                Txt_Text.Location = new System.Drawing.Point(Txt_Text.Location.X, Txt_Text.Location.Y + 15);
         }
 
         /// <summary>

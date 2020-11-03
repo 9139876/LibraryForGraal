@@ -203,23 +203,49 @@ namespace Graal.Library.Storage.Common
 
         #region QuotesParser
 
-        DbDataAdapter quotesParserAdapter;
-        public DbDataAdapter QuotesParserAdapter
+        public Dictionary<string, string> GetAllParsers()
         {
-            get
-            {
-                if (quotesParserAdapter == null)
-                {
-                    quotesParserAdapter = new NpgsqlDataAdapter()
-                    {
-                        SelectCommand = new NpgsqlCommand($"select * from {SchemaName}.{RoutinesNames.get_all_quotes_parsers}()", connection as NpgsqlConnection),
-                        InsertCommand = new NpgsqlCommand("", connection as NpgsqlConnection),
-                        UpdateCommand = new NpgsqlCommand("", connection as NpgsqlConnection),
-                        DeleteCommand = new NpgsqlCommand("", connection as NpgsqlConnection)
-                    };
-                }
+            Dictionary<string, string> res = new Dictionary<string, string>();
 
-                return quotesParserAdapter;
+            using (var cmd = connection.CreateCommand())
+            {
+                cmd.CommandText = $"select * from {SchemaName}.{RoutinesNames.parsers_get_all}()";
+
+                using (var reader = cmd.ExecuteReader())
+                {
+                    while (reader.Read())
+                    {
+                        res.Add(reader[0].ToString(), reader[1].ToString());
+                    }
+                }
+            }
+
+            return res;
+        }
+
+        public void RenameParser(string from, string to)
+        {
+            using (var cmd = connection.CreateCommand())
+            {
+                cmd.CommandText = $"call {SchemaName}.{RoutinesNames.parsers_rename_parser}(@from, @to)";
+
+                cmd.AddParameter("from", from);
+                cmd.AddParameter("to", to);
+
+                cmd.ExecuteNonQuery();
+            }
+        }
+
+        public void AddParser(string name, string serialize)
+        {
+            using (var cmd = connection.CreateCommand())
+            {
+                cmd.CommandText = $"call {SchemaName}.{RoutinesNames.parsers_add_parser}(@name, @serialize)";
+
+                cmd.AddParameter("name", name);
+                cmd.AddParameter("serialize", serialize);
+
+                cmd.ExecuteNonQuery();
             }
         }
 
@@ -230,5 +256,16 @@ namespace Graal.Library.Storage.Common
         public static string SchemaName => Environment.GetEnvironmentVariable(AppGlobal.EnvironmentVariableGraalSchemaName, EnvironmentVariableTarget.User);
 
         #endregion
+    }
+
+    public static class DbCommandExtensionMethods
+    {
+        public static void AddParameter(this IDbCommand command, string name, object value)
+        {
+            var parameter = command.CreateParameter();
+            parameter.ParameterName = name;
+            parameter.Value = value;
+            command.Parameters.Add(parameter);
+        }
     }
 }

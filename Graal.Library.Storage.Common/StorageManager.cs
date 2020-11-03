@@ -96,19 +96,15 @@ namespace Graal.Library.Storage.Common
             }
         }
 
-        IGraalDataSet quotesParsersTable;
-        public IGraalDataSet QuotesParsersTable
-        {
-            get
-            {
-                if (quotesParsersTable == null)
-                {
-                    quotesParsersTable = new GraalDataSet(sqlDriver.QuotesParserAdapter);
-                }
+        #region Parsers
 
-                return quotesParsersTable;
-            }
-        }
+        public Dictionary<string, string> GetAllParsers() => sqlDriver.GetAllParsers();
+
+        public void RenameParser(string from, string to) => sqlDriver.RenameParser(from, to);
+
+        public void AddParser(string name, string serialize) => sqlDriver.AddParser(name, serialize);
+
+        #endregion
 
         #region static
 

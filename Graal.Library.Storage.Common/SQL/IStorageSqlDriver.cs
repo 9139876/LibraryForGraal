@@ -23,6 +23,10 @@ namespace Graal.Library.Storage.Common
 
         string DBName { get; }
 
-        DbDataAdapter QuotesParserAdapter { get; }
+        Dictionary<string, string> GetAllParsers();
+
+        void RenameParser(string from, string to);
+
+        void AddParser(string name, string serialize);
     }
 }

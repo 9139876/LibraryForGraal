@@ -189,3 +189,20 @@ AS $function$ select name, specification from testt.quotes_parser_expressions wh
 ;
 
 select * from testt.get_all_quotes_parsers();
+
+CREATE OR REPLACE PROCEDURE parsers_rename_parser()
+ 
+ LANGUAGE sql
+AS $function$ select name, specification from testt.quotes_parser_expressions where name != 'empty' $function$
+;
+
+select * from testt.get_all_quotes_parsers();
+
+CREATE OR REPLACE PROCEDURE testt.parsers_add_parser(_name text, _serialize text)
+    LANGUAGE sql
+AS $procedure$  
+    insert into testt.quotes_parser_expressions (name, serialize) values (_name, _serialize);
+ $procedure$
+;
+
+

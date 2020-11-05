@@ -1,4 +1,5 @@
 ﻿using Graal.Library.Common.Enums;
+using Newtonsoft.Json.Linq;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -84,6 +85,8 @@ namespace Graal.Library.Common.Quotes
 
             return hashCode;
         }
+
+        public string ToJson() => ((JObject)JToken.FromObject(this)).ToString();
     }
 }
 
